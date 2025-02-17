@@ -1,0 +1,46 @@
+<h2>Iniciar sesión</h2>
+
+<form id="loginForm">
+    <input type="email" id="email" name="email" placeholder="Correo electrónico" required>
+    <input type="password" id="password" name="password" placeholder="Contraseña" required>
+    <button type="submit">Iniciar sesión</button>
+</form>
+
+<p id="loginError" style="color: red; display: none;">Correo o contraseña incorrectos.</p>
+
+<hr>
+<p style="text-align: center; margin-top: 15px;">
+    ¿No tienes una cuenta? <a href="/register" style="color: #007bff; text-decoration: none; font-weight: bold;">Regístrate aquí</a>
+</p>
+<p style="text-align: center; margin-top: 10px;">
+    ¿Olvidaste tu contraseña? <a href="/forgot-password" style="color: #ff5733; text-decoration: none; font-weight: bold;">Recupérala aquí</a>
+</p>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", async (event) => {
+        event.preventDefault(); // Evita el envío automático del formulario
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+            const response = await fetch("/api/sessions", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password })
+            });
+
+        const data = await response.json();
+
+                if (response.ok) {
+                    alert("✅ Inicio de sesión exitoso");
+                    window.location.href = data.redirectUrl; 
+                } else {
+                    alert(`❌ Error: ${data.message}`);
+                }
+            } catch (error) {
+                console.error("Error en el login:", error);
+                alert("❌ Error interno del servidor.");
+            }
+        });
+</script>

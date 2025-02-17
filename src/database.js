@@ -1,11 +1,10 @@
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+require('dotenv').config();
+const mongoose = require('mongoose');
+const config = require('./config'); // Importamos la configuración de entornos
 
-console.log("🔍 Valor de MONGO_URI:", process.env.MONGO_URI); // Verificar si se carga la URI
-console.log(typeof process.env.MONGO_URI);    
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
+    await mongoose.connect(config.mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       serverApi: {
@@ -14,12 +13,11 @@ const connectDB = async () => {
         deprecationErrors: true
       }
     });
-    console.log("✅ Conectado exitosamente a MongoDB Atlas");
+    console.log(`Conectado exitosamente a MongoDB en modo ${config.env}`);
   } catch (error) {
-    console.error("❌ Error al conectar con MongoDB Atlas:", error);
+    console.error("Error al conectar con MongoDB:", error);
     process.exit(1);
   }
 };
 
-// Exportar la función correctamente para usar en app.js
-export default connectDB;
+module.exports = connectDB;

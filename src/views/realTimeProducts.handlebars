@@ -1,0 +1,53 @@
+{{> header }}
+<h1>Productos en Tiempo Real</h1>
+
+<!-- Formulario para filtros de productos -->
+<div id="filterForm">
+    <h2>Filtrar Productos</h2>
+    <input type="number" id="limit" placeholder="Límite (ej. 10)">
+    <input type="number" id="page" placeholder="Página (ej. 1)">
+    
+    <!-- Dropdown para ordenamiento -->
+    <select id="sort">
+        <option value="">Ordenar por Precio</option>
+        <option value="asc">Ascendente</option>
+        <option value="desc">Descendente</option>
+    </select>
+
+    <!-- Dropdown para categoría -->
+    <select id="query">
+        <option value="">Selecciona una Categoría</option>
+        <option value="Categoría A">Categoría A</option>
+        <option value="Categoría B">Categoría B</option>
+        <option value="Categoría C">Categoría C</option>
+    </select>
+
+    <button onclick="applyFilters()">Aplicar Filtros</button>
+</div>
+
+<!-- Formulario para agregar un nuevo producto -->
+<div id="productForm">
+    <h2>Agregar un Nuevo Producto</h2>
+    <input type="text" id="title" placeholder="Título del producto" required>
+    <input type="text" id="description" placeholder="Descripción" required>
+    <input type="text" id="code" placeholder="Código" required>
+    <input type="number" id="price" placeholder="Precio" required>
+    <input type="number" id="stock" placeholder="Stock" required>
+
+    <!-- Dropdown para seleccionar la categoría -->
+    <select id="category" required>
+        <option value="">Selecciona una Categoría</option>
+        <option value="Categoría A">Categoría A</option>
+        <option value="Categoría B">Categoría B</option>
+        <option value="Categoría C">Categoría C</option>
+    </select>
+
+    <button onclick="addProduct()">Agregar Producto</button>
+</div>
+
+<ul id="productList"></ul>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realtimeProducts.js"></script>
+
+{{> footer }}

@@ -1,41 +1,37 @@
-import { Router } from 'express';
-import { generateMockUser, generateMockPet } from '../utils/mocking.js';
-import userModel from '../dao/models/User.js';
-import petModel from '../dao/models/Pet.js';
+const express = require('express');
+const { generateMockUsers, generateMockProducts } = require('../utils/mocks');
+const UserRepository = require('../dao/repositories/UserRepository');
+const ProductRepository = require('../dao/repositories/ProductRepository');
 
-const router = Router();
+const router = express.Router();
 
-// Generar 100 mascotas ficticias
-router.get('/mockingpets', (req, res) => {
-    const pets = Array.from({ length: 100 }, generateMockPet);
-    res.json(pets);
-});
-
-// Generar 50 usuarios ficticios
-router.get('/mockingusers', (req, res) => {
-    const users = Array.from({ length: 50 }, generateMockUser);
-    res.json(users);
-});
-
-// Generar e insertar usuarios y mascotas en la base de datos
-router.post('/generateData', async (req, res) => {
-    const { users, pets } = req.body;
-
-    if (!users || !pets || users < 1 || pets < 1) {
-        return res.status(400).json({ message: "Parámetros inválidos" });
-    }
-
+router.post('/:users/:products', async (req, res) => {
     try {
-        const mockUsers = Array.from({ length: users }, generateMockUser);
-        const insertedUsers = await userModel.insertMany(mockUsers);
+        const numUsers = parseInt(req.params.users, 10);
+        const numProducts = parseInt(req.params.products, 10);
 
-        const mockPets = Array.from({ length: pets }, generateMockPet);
-        await petModel.insertMany(mockPets);
+        if (isNaN(numUsers) || isNaN(numProducts)) {
+            return res.status(400).json({ error: 'Parameters must be numbers' });
+        }
 
-        res.json({ message: "Datos generados correctamente", users: insertedUsers.length, pets: mockPets.length });
+        const newUsers = generateMockUsers(numUsers);
+        const newProducts = generateMockProducts(numProducts);
+
+        await Promise.all([
+            ...newUsers.map(user => UserRepository.createUser(user)),
+            ...newProducts.map(product => ProductRepository.addProduct(product))
+        ]);
+
+        res.status(201).json({
+            message: 'Users and products successfully created',
+            usersCreated: numUsers,
+            productsCreated: numProducts
+        });
+
     } catch (error) {
-        res.status(500).json({ message: "Error al insertar datos", error });
+        console.error('❌ Error generating mocks:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-export default router;
+module.exports = router;

@@ -1,0 +1,105 @@
+<header>
+    <nav>
+        <div class="logo">🏪 Tienda</div>
+        <ul class="menu" id="menu-items"></ul>
+        <div class="icons-container">
+            <div class="cart-icon" id="cart-icon">
+                <a href="/api/carts/view">🛒 <span id="cart-count" class="cart-count">0</span></a>
+            </div>
+            <div class="user-container" id="user-container">
+                <span id="user-name" class="user-name">👤 Cargando...</span>
+                <div class="user-menu" id="user-menu">
+                    <button id="logout-btn">🚪 Cerrar sesión</button>
+                </div>
+            </div>
+        </div>
+    </nav> 
+</header>
+
+<style>
+    .user-container {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .user-menu {
+        display: none;
+        color: black;
+        position: absolute;
+        border: 1px solid #ccc;
+        padding: 10px;
+        right: 0;
+        top: 40px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        width: 130px;
+    }
+
+    #logout-btn {
+
+        color: black;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+    } 
+
+    .user-menu.active {
+        display: block;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const menuItems = document.getElementById("menu-items");
+        const userContainer = document.getElementById("user-container");
+        const userName = document.getElementById("user-name");
+        const userMenu = document.getElementById("user-menu");
+
+        try {
+            const userResponse = await fetch("/api/sessions/current", { credentials: "include" });
+            const userData = await userResponse.json();
+
+            if (userData.user) {
+                userName.innerText = `👤 ${userData.user.first_name || "Usuario"}`;
+
+                // Agregar el menú dinámicamente según el rol
+                menuItems.innerHTML = "";
+                const menuItem = document.createElement("li");
+                const menuLink = document.createElement("a");
+
+                if (userData.user.isAdmin) {
+                    menuLink.href = "/realtimeproducts";
+                    menuLink.textContent = "Administrar Catálogo";
+                } else {
+                    menuLink.href = "/catalog";
+                    menuLink.textContent = "Catálogo";
+                }
+
+                menuItem.appendChild(menuLink);
+                menuItems.appendChild(menuItem);
+            }
+        } catch (error) {
+            console.error("⚠️ No se pudo obtener el usuario:", error);
+        }
+
+        userContainer.addEventListener("click", () => {
+            userMenu.classList.toggle("active");
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!userMenu.contains(event.target) && !userContainer.contains(event.target)) {
+                userMenu.classList.remove("active");
+            }
+        });
+
+        document.getElementById("logout-btn").addEventListener("click", async () => {
+            if (confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+                try {
+                    await fetch("/api/sessions/logout", { method: "POST", credentials: "include" });
+                    window.location.href = "/login";
+                } catch (error) {
+                    console.error("❌ Error cerrando sesión:", error);
+                }
+            }
+        });
+    });
+</script>

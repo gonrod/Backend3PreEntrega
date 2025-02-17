@@ -1,0 +1,53 @@
+<h2>Registración</h2>
+
+<form id="registerForm">
+    <input type="text" name="first_name" placeholder="Nombre" required>
+    <input type="text" name="last_name" placeholder="Apellido" required>
+    <input type="email" name="email" placeholder="Correo electrónico" required>
+    <input type="password" name="password" placeholder="Contraseña" required>
+
+    <label for="age">Fecha de nacimiento:</label>
+    <input type="date" name="age" id="age" required>
+
+    <label for="role">Selecciona un rol:</label>
+    <select name="role" id="role" required>
+        <option value="user">Usuario</option>
+        <option value="admin">Administrador</option>
+    </select>
+
+    <button type="submit">Registrarme</button>
+</form>
+
+<hr>
+<p style="text-align: center; margin-top: 15px;">
+    ¿Ya tienes una cuenta? <a href="/login" style="color: #007bff; text-decoration: none; font-weight: bold;">Inicia sesión aquí</a>
+</p>
+
+<script>
+    document.getElementById("registerForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        const data = Object.fromEntries(formData);
+
+        try {
+            const response = await fetch("/api/sessions/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("✅ Registro exitoso. Serás redirigido al login.");
+                window.location.href = "/login"; // 🔄 Redirigir al usuario
+            } else {
+                alert(`❌ Error: ${result.error || "No se pudo registrar el usuario."}`);
+            }
+        } catch (error) {
+            alert("❌ Error en el registro. Inténtalo de nuevo.");
+            console.error("Error en el registro:", error);
+        }
+    });
+</script>

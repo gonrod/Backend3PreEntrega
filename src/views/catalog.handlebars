@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    {{> header}}
+
+    <h1>Catálogo de Productos</h1>
+
+    <!-- Paginación y Filtros -->
+    <div>
+        <form action="/products" method="get">
+            <label for="limit">Límite:</label>
+            <input type="number" id="limit" name="limit" value="{{limit}}" min="1" />
+
+            <label for="page">Página:</label>
+            <input type="number" id="page" name="page" value="{{page}}" min="1" />
+
+            <label for="sort">Ordenar por Precio:</label>
+            <select id="sort" name="sort">
+                <option value="">Sin Orden</option>
+                <option value="asc" {{#if (eq sort "asc")}}selected{{/if}}>Ascendente</option>
+                <option value="desc" {{#if (eq sort "desc")}}selected{{/if}}>Descendente</option>
+            </select>
+
+            <label for="query">Categoría:</label>
+            <select id="query" name="query">
+                <option value="">Todas las Categorías</option>
+                <option value="Categoría A" {{#if (eq query "Categoría A")}}selected{{/if}}>Categoría A</option>
+                <option value="Categoría B" {{#if (eq query "Categoría B")}}selected{{/if}}>Categoría B</option>
+                <option value="Categoría C" {{#if (eq query "Categoría C")}}selected{{/if}}>Categoría C</option>
+            </select>
+
+            <button type="submit">Aplicar Filtros</button>
+        </form>
+    </div>
+
+    <!-- Lista de Productos -->
+    <div id="productContainer">
+        <ul class="productList simple">
+            {{#each products}}
+            <li class="product-item">
+                <div class="product-info">
+                    <a href="/products/{{this._id}}">
+                        <h2 class="product-title">{{this.title}}</h2>
+                    </a>
+                    <p class="product-price">Precio: ${{this.price}}</p>
+                    <p class="product-description">{{this.description}}</p>
+                    <button class="add-to-cart-btn" data-product-id="{{this._id}}">Añadir al Carrito</button>
+                </div>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+
+    {{> footer}}
+
+    <script>
+document.addEventListener("DOMContentLoaded", async () => {
+    let cartIcon = document.getElementById("cart-icon");
+
+    // Obtener el cartId del usuario autenticado
+    const getCartId = async () => {
+        try {
+            const response = await axios.get("/api/carts/my-cart");
+            return response.data.cartId;
+        } catch (error) {
+            console.error("❌ Error obteniendo el cartId:", error);
+            return null;
+        }
+    };
+
+    let cartId = await getCartId();
+
+    if (!cartId) {
+        console.error("⚠️ No se pudo obtener el cartId del usuario.");
+        alert("Debes iniciar sesión para agregar productos al carrito.");
+        return;
+    }
+
+    const cartCountElement = document.getElementById("cart-count");
+    let cartCount = 0;
+
+    const updateCartCount = async () => {
+        try {
+            const response = await axios.get(`/api/carts/${cartId}`);
+            cartCount = response.data.products.length;
+            cartCountElement.textContent = cartCount;
+        } catch (error) {
+            console.error("❌ Error al obtener el carrito:", error.response ? error.response.data : error);
+        }
+    };
+
+    await updateCartCount();
+
+    // Manejar eventos de "Agregar al carrito"
+    document.querySelectorAll(".add-to-cart-btn").forEach(button => {
+        button.addEventListener("click", async (event) => {
+            const productId = event.target.getAttribute("data-product-id");
+            console.log(`🛒 Intentando añadir producto ${productId} al carrito ${cartId}`);
+
+            try {
+                const response = await axios.post(`/api/carts/${cartId}/product/${productId}`);
+
+                if (response.status === 201) {
+                    cartCount++;
+                    cartCountElement.textContent = cartCount;
+                    alert("✅ Producto añadido al carrito.");
+                } else {
+                    console.warn("⚠️ Respuesta inesperada:", response);
+                    alert("No se pudo añadir el producto al carrito.");
+                }
+            } catch (error) {
+                console.error("❌ Error al agregar producto:", error.response ? error.response.data : error);
+                alert("No se pudo añadir el producto al carrito.");
+            }
+        });
+    });
+});
+    </script>
+</body>
+</html>

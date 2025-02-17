@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Carrito</title>
+</head>
+<body>
+    {{> header}}
+
+    <h1>Mi Carrito</h1>
+
+    {{#if emptyCart}}
+        <p>Tu carrito está vacío.</p>
+    {{else}}
+        <div id="cart-container">
+            <ul class="cart-list">
+                {{#each cart.products}}
+                <li class="cart-item" id="cart-item-{{this.product._id}}">
+                    <div class="cart-product-info">
+                        <h3>{{this.product.title}}</h3>
+                        <p>Precio: ${{this.product.price}}</p>
+                        <p>Cantidad: <span class="quantity">{{this.quantity}}</span></p>
+                        <button class="remove-from-cart-btn" data-product-id="{{this.product._id}}">Eliminar</button>
+                    </div>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+
+        <!-- Sección de Totales -->
+        <div id="cart-summary">
+            <hr>
+            <p><strong>Subtotal:</strong> <span id="subtotal"></span></p>
+            <p><strong>Total de productos:</strong> <span id="total-items"></span></p>
+            <button id="checkout-btn">Finalizar Compra</button>
+        </div>
+    {{/if}}
+
+
+<div id="ticket-container" style="display:none; margin-top: 20px; border: 1px solid black; padding: 10px;">
+    <h2>🎟 Ticket de Compra</h2>
+    <p><strong>Código:</strong> <span id="ticket-code"></span></p>
+    <p><strong>Total:</strong> <span id="ticket-total"></span></p>
+    <p><strong>Fecha:</strong> <span id="ticket-date"></span></p>
+    <h3>Productos Comprados:</h3>
+    <ul id="ticket-products"></ul>
+</div>
+    {{> footer}}
+
+<script>
+document.getElementById("checkout-btn")?.addEventListener("click", async () => {
+    const cartId = "{{cart._id}}";
+
+    try {
+        const response = await fetch(`/api/carts/${cartId}/purchase`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        });
+        const data = await response.json();
+
+        console.log("📌 Respuesta de la API de compra:", data);
+
+        if (data.error) {
+            alert("❌ No se pudo completar la compra: " + data.error);
+        } else {
+            alert("✅ Compra realizada con éxito. Código de Ticket: " + data.ticket.code);
+
+            const ticketCodeEl = document.getElementById("ticket-code");
+            const ticketTotalEl = document.getElementById("ticket-total");
+            const ticketDateEl = document.getElementById("ticket-date");
+            const ticketProductsEl = document.getElementById("ticket-products");
+
+            if (ticketCodeEl && ticketTotalEl && ticketDateEl && ticketProductsEl) {
+                ticketCodeEl.textContent = data.ticket.code;
+                ticketTotalEl.textContent = `$${data.ticket.totalAmount}`;
+                ticketDateEl.textContent = new Date(data.ticket.purchaseDate).toLocaleString();
+
+                console.log("🛒 Productos recibidos:", data.purchasedProducts);
+
+                ticketProductsEl.innerHTML = data.purchasedProducts.map(p => {
+                    return `<li>${p.product?.title || "Producto desconocido"} (x${p.quantity})</li>`;
+                }).join("");
+
+                document.getElementById("ticket-container").style.display = "block";
+                document.getElementById("cart-container").style.display = "none";
+                document.getElementById("cart-summary").style.display = "none";
+            } else {
+                console.error("❌ No se encontraron los elementos del ticket en el DOM.");
+            }
+        }
+    } catch (error) {
+        console.error("❌ Error en la compra:", error);
+        alert("No se pudo completar la compra.");
+    }
+});
+
+// Función para eliminar productos del carrito
+async function removeFromCart(productId) {
+    const cartId = "{{cart._id}}";
+
+    try {
+        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" }
+        });
+        const data = await response.json();
+
+        if (data.error) {
+            alert("❌ No se pudo eliminar el producto.");
+        } else {
+            alert("✅ Producto eliminado del carrito.");
+            window.location.reload();
+        }
+    } catch (error) {
+        console.error("❌ Error eliminando producto:", error);
+    }
+}
+</script>
+
+</body>
+</html>
