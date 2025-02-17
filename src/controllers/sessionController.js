@@ -159,17 +159,11 @@ const postLogin = (req, res, next) => {
 const getCurrentSession = async (req, res) => {
     try {
         if (!req.user) {
-            return res.status(401).json({ error: "No autenticado" }); // ✅ Enviar JSON en lugar de redirigir
+            return res.status(401).json({ error: "No autenticado" });
         }
 
-        res.status(200).json({
-            user: {
-                first_name: req.user.first_name,
-                email: req.user.email,
-                role: req.user.role,
-                isAdmin: req.user.role === "admin"
-            }
-        });
+        const userDTO = new UserDTO(req.user); // ✅ Aplicar DTO antes de enviarlo
+        res.status(200).json({ user: userDTO });
     } catch (error) {
         console.error("Error obteniendo la sesión:", error);
         res.status(500).json({ error: "Error del servidor" });

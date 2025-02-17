@@ -11,6 +11,7 @@ const connectDB = require('./database');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
 const { authenticateJWT } = require('./middlewares/auth');
+const logger = require("./utils/logger"); // O la ruta correcta
 
 
 const EventEmitter = require('events');
