@@ -5,7 +5,7 @@ class UserDAO {
         try {
             return await User.findById(userId);
         } catch (error) {
-            console.error("Error obteniendo usuario:", error);
+            logger.error("Error obteniendo usuario:", error);
             throw error;
         }
     }
@@ -14,7 +14,7 @@ class UserDAO {
         try {
             return await User.findOne({ email });
         } catch (error) {
-            console.error("Error obteniendo usuario por email:", error);
+            logger.error("Error obteniendo usuario por email:", error);
             throw error;
         }
     }
@@ -24,7 +24,7 @@ class UserDAO {
             const newUser = new User(userData);
             return await newUser.save();
         } catch (error) {
-            console.error("Error creando usuario:", error);
+            logger.error("Error creando usuario:", error);
             throw error;
         }
     }
@@ -33,7 +33,7 @@ class UserDAO {
         try {
             return await User.findByIdAndUpdate(userId, updateData, { new: true });
         } catch (error) {
-            console.error("❌ Error actualizando usuario:", error);
+            logger.error("❌ Error actualizando usuario:", error);
             throw error;
         }
     }

@@ -5,7 +5,7 @@ class CartDAO {
         try {
             return await Cart.findById(cartId).populate('products.product');
         } catch (error) {
-            console.error("Error obteniendo el carrito:", error);
+            logger.error("Error obteniendo el carrito:", error);
             throw error;
         }
     }
@@ -15,7 +15,7 @@ class CartDAO {
             const newCart = new Cart({ user: userId, products: [] });
             return await newCart.save();
         } catch (error) {
-            console.error("Error creando el carrito:", error);
+            logger.error("Error creando el carrito:", error);
             throw error;
         }
     }
@@ -34,7 +34,7 @@ class CartDAO {
 
             return await cart.save();
         } catch (error) {
-            console.error("Error agregando producto al carrito:", error);
+            logger.error("Error agregando producto al carrito:", error);
             throw error;
         }
     }
@@ -47,7 +47,7 @@ class CartDAO {
             cart.products = cart.products.filter(p => p.product.toString() !== productId);
             return await cart.save();
         } catch (error) {
-            console.error("Error eliminando producto del carrito:", error);
+            logger.error("Error eliminando producto del carrito:", error);
             throw error;
         }
     }

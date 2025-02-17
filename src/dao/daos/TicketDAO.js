@@ -6,7 +6,7 @@ class TicketDAO {
             const newTicket = new Ticket(ticketData);
             return await newTicket.save();
         } catch (error) {
-            console.error("Error creando ticket:", error);
+            logger.error("Error creando ticket:", error);
             throw error;
         }
     }
@@ -15,7 +15,7 @@ class TicketDAO {
         try {
             return await Ticket.findById(ticketId).populate('user').populate('products.product');
         } catch (error) {
-            console.error("Error obteniendo ticket:", error);
+            logger.error("Error obteniendo ticket:", error);
             throw error;
         }
     }
@@ -24,7 +24,7 @@ class TicketDAO {
         try {
             return await Ticket.find().populate('user').populate('products.product');
         } catch (error) {
-            console.error("Error obteniendo tickets:", error);
+            logger.error("Error obteniendo tickets:", error);
             throw error;
         }
     }
