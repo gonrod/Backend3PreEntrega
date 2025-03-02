@@ -9,7 +9,7 @@ const logFormat = winston.format.printf(({ timestamp, level, message }) => {
 
 // Create Winston logger with daily rotation
 const logger = winston.createLogger({
-    level: 'info',
+    level: 'info', // Mantiene 'info' para incluir error, warn, http e info
     format: winston.format.combine(
         winston.format.timestamp(),
         logFormat
@@ -20,13 +20,27 @@ const logger = winston.createLogger({
             filename: path.join(__dirname, '../logs/error-%DATE%.log'),
             datePattern: 'YYYY-MM-DD',
             level: 'error',
-            maxSize: '20m', // Max file size before rotation
-            maxFiles: '7d',  // Keep logs for 7 days
+            maxSize: '20m',
+            maxFiles: '7d',
         }),
         new DailyRotateFile({
             filename: path.join(__dirname, '../logs/http-%DATE%.log'),
             datePattern: 'YYYY-MM-DD',
             level: 'http',
+            maxSize: '20m',
+            maxFiles: '7d',
+        }),
+        new DailyRotateFile({ 
+            filename: path.join(__dirname, '../logs/info-%DATE%.log'), 
+            datePattern: 'YYYY-MM-DD',
+            level: 'info',
+            maxSize: '20m',
+            maxFiles: '7d',
+        }),
+        new DailyRotateFile({ 
+            filename: path.join(__dirname, '../logs/warn-%DATE%.log'), 
+            datePattern: 'YYYY-MM-DD',
+            level: 'warn',
             maxSize: '20m',
             maxFiles: '7d',
         })

@@ -3,7 +3,7 @@ const Product = require('../models/Product');
 class ProductDAO {
 
     static async getAll() {
-        const products = await ProductModel.find();
+        const products = await Product.find();
         return products;
     }
 
@@ -11,7 +11,6 @@ class ProductDAO {
         try {
             return await Product.find(filters);
         } catch (error) {
-            logger.error("Error obteniendo productos:", error);
             throw error;
         }
     }
@@ -20,7 +19,6 @@ class ProductDAO {
         try {
             return await Product.findById(productId);
         } catch (error) {
-            logger.error("Error obteniendo el producto:", error);
             throw error;
         }
     }
@@ -30,7 +28,14 @@ class ProductDAO {
             const newProduct = new Product(productData);
             return await newProduct.save();
         } catch (error) {
-            logger.error("Error creando producto:", error);
+            throw error;
+        }
+    }
+
+    async createProducts(products) {
+        try {
+            return await Product.insertMany(products);
+        } catch (error) {
             throw error;
         }
     }
@@ -39,7 +44,6 @@ class ProductDAO {
         try {
             return await Product.findByIdAndUpdate(productId, updateData, { new: true });
         } catch (error) {
-            logger.error("Error actualizando producto:", error);
             throw error;
         }
     }
@@ -48,7 +52,6 @@ class ProductDAO {
         try {
             return await Product.findByIdAndDelete(productId);
         } catch (error) {
-            logger.error("Error eliminando producto:", error);
             throw error;
         }
     }

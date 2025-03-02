@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const jwt = require("jsonwebtoken");
 const UserModel = require("../dao/models/User");
-const logger = require("../utils/logger"); 
+const logger = require("../utils/loggerUtils"); 
 
 
 const isLoggedIn = (req, res, next) => {

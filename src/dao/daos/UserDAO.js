@@ -1,11 +1,9 @@
 const User = require('../models/User');
-
 class UserDAO {
     async getUserById(userId) {
         try {
             return await User.findById(userId);
         } catch (error) {
-            logger.error("Error obteniendo usuario:", error);
             throw error;
         }
     }
@@ -14,7 +12,6 @@ class UserDAO {
         try {
             return await User.findOne({ email });
         } catch (error) {
-            logger.error("Error obteniendo usuario por email:", error);
             throw error;
         }
     }
@@ -24,7 +21,6 @@ class UserDAO {
             const newUser = new User(userData);
             return await newUser.save();
         } catch (error) {
-            logger.error("Error creando usuario:", error);
             throw error;
         }
     }
@@ -33,7 +29,6 @@ class UserDAO {
         try {
             return await User.findByIdAndUpdate(userId, updateData, { new: true });
         } catch (error) {
-            logger.error("❌ Error actualizando usuario:", error);
             throw error;
         }
     }

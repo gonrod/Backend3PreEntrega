@@ -9,10 +9,12 @@ const ProductRepository = require("./ProductRepository");
  */
 const saveMockData = async (users, products) => {
     try {
-        await Promise.all([
-            UserRepository.createUsers(users),
-            ProductRepository.createProducts(products),
-        ]);
+        for (const user of users) {
+            await UserRepository.createUser(user);
+        }
+
+        await ProductRepository.createProducts(products); // ✅ Usamos `createProducts()`
+
         return { users, products };
     } catch (error) {
         console.error("❌ Error saving mock data:", error);

@@ -2,8 +2,7 @@ const ProductDAO = require('../daos/ProductDAO');
 
 class ProductRepository {
     static async getAllProducts() {
-        const products = await ProductDAO.getAllProducts();
-        return products;
+        return await ProductDAO.getAllProducts();
     }
 
     static async getFilteredProducts(filters) {
@@ -17,12 +16,11 @@ class ProductRepository {
                 console.error(`❌ Producto con ID ${id} no encontrado en la base de datos.`);
                 return null;
             }
-    
-            // Verificar que los datos esenciales existen
+
             if (!product.title || !product.price) {
                 console.warn(`⚠️ Producto con ID ${id} encontrado, pero le faltan datos:`, product);
             }
-    
+
             console.log("✅ Producto obtenido correctamente:", product);
             return product;
         } catch (error) {
@@ -31,16 +29,20 @@ class ProductRepository {
         }
     }
 
-    static async addProduct(productData) {
+    static async createProduct(productData) {
         return await ProductDAO.createProduct(productData);
     }
 
+    static async createProducts(products) {
+        return await ProductDAO.createProducts(products);
+    }
+
     static async updateProduct(id, productData) {
-        return await ProductDAO.updateProduct(id, productData)
+        return await ProductDAO.updateProduct(id, productData);
     }
 
     static async deleteProduct(id) {
-        return await ProductDAO.deleteProduct(id)
+        return await ProductDAO.deleteProduct(id);
     }
 }
 

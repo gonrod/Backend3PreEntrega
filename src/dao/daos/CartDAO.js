@@ -1,5 +1,4 @@
 const Cart = require('../models/Cart');
-
 class CartDAO {
     async getCartById(cartId) {
         try {
